@@ -5,8 +5,8 @@ import uuid
 
 ALLOWED_USER_IDS = [11111111] # get it from https://t.me/userinfobot
 ADMIN_UUID = "Admin-UUID"
-ADMIN_URLAPI = "Admin-UURL"
-SUBLINK_URL = "subscription_URL"
+ADMIN_URLAPI = "https://Admin-UURL"
+SUBLINK_URL = "https://subscription_URL"
 TELEGRAM_TOKEN = "BOT-TOKEN"
 
 class HiddifyApi:
@@ -17,10 +17,12 @@ class HiddifyApi:
         self.telegram_token = TELEGRAM_TOKEN
         self.sublinkurl = SUBLINK_URL
 
-    def generate_uuid(self):
+    def generate_uuid(self) -> str:
+        """Generate a UUID."""
         return str(uuid.uuid4())
 
-    def is_connected(self):
+    def is_connected(self) -> bool:
+        """Check if the API is connected."""
         try:
             response = requests.get(f"{self.base_url}/admin/get_data/")
             return isinstance(response.json(), dict)
@@ -28,7 +30,8 @@ class HiddifyApi:
             print(f"Error in is_connected: {e}")
             return False
 
-    def get_system_status(self):
+    def get_system_status(self) -> dict:
+        """Get the system status."""
         try:
             response = requests.get(f"{self.base_url}/admin/get_data/")
             data = response.json()
@@ -40,7 +43,17 @@ class HiddifyApi:
             print(f"Error in get_system_status: {e}")
             return {}
 
-    def get_user_list(self):
+    def make_post_request(self, endpoint: str, json_data: dict) -> bool:
+        """Make a POST request."""
+        try:
+            response = requests.post(endpoint, json=json_data)
+            return response.status_code == 200
+        except requests.RequestException as e:
+            print(f"Error in making POST request: {e}")
+            return False
+
+    def get_user_list(self) -> list:
+        """Get the list of users."""
         try:
             response = requests.get(f"{self.base_url}/api/v1/user/")
             return response.json()
@@ -48,7 +61,8 @@ class HiddifyApi:
             print(f"Error in get_user_list: {e}")
             return []
 
-    def add_service(self, uuid, comment, name, day, traffic, telegram_id):
+    def add_service(self, uuid: str, comment: str, name: str, day: int, traffic: int, telegram_id: int) -> bool:
+        """Add a new service."""
         if telegram_id not in self.allowed_user_ids:
             print("Unauthorized user tried to add a service.")
             return False
@@ -68,37 +82,55 @@ class HiddifyApi:
             "uuid": uuid,
         }
 
-        try:
-            response = requests.post(f"{self.base_url}/api/v1/user/", json=data)
-            return uuid if response.json() else False
-        except requests.RequestException as e:
-            print(f"Error in add_service: {e}")
-            return False
+        endpoint = f"{self.base_url}/api/v1/user/"
+        return self.make_post_request(endpoint, data)
 
-    def reset_user_last_reset_time(self, uuid):
+    def reset_user_last_reset_time(self, uuid: str) -> bool:
+        """Reset the user's last reset time."""
         try:
             user_data = self.find_service(uuid)
-
             if not user_data:
                 print("User not found.")
                 return False
-
             user_data['last_reset_time'] = datetime.now().strftime('%Y-%m-%d')
             user_data['start_date'] = None
             user_data['current_usage_GB'] = 0
-            response = requests.post(f"{self.base_url}/api/v1/user/?uuid={uuid}", json=user_data)
-            if response.status_code == 200:
-                print("User data reset successfully.")
-                return True
-            else:
-                print(f"Failed to reset user data. Status code: {response.status_code}")
-                print(f"Response content: {response.content}")
-                return False
+            endpoint = f"{self.base_url}/api/v1/user/?uuid={uuid}"
+            return self.make_post_request(endpoint, user_data)
         except requests.RequestException as e:
             print(f"Error in reset_user_last_reset_time: {e}")
             return False
 
-    def find_service(self, uuid):
+    def update_package_days(self, uuid: str, new_days: int) -> bool:
+        """Update the package days for a user."""
+        try:
+            user_data = self.find_service(uuid)
+            if not user_data:
+                print("User not found.")
+                return False
+            user_data['package_days'] = new_days
+            endpoint = f"{self.base_url}/api/v1/user/?uuid={uuid}"
+            return self.make_post_request(endpoint, user_data)
+        except requests.RequestException as e:
+            print(f"Error in update_package_days: {e}")
+            return False
+
+    def update_traffic(self, uuid: str, new_traffic: int) -> bool:
+        """Update the traffic limit for a user."""
+        try:
+            user_data = self.find_service(uuid)
+            if not user_data:
+                print("User not found.")
+                return False
+            user_data['usage_limit_GB'] = new_traffic
+            endpoint = f"{self.base_url}/api/v1/user/?uuid={uuid}"
+            return self.make_post_request(endpoint, user_data)
+        except requests.RequestException as e:
+            print(f"Error in update_traffic: {e}")
+            return False
+
+    def find_service(self, uuid: str) -> dict:
+        """Find a service by UUID."""
         user_list = self.get_user_list()
         user_data = next((user for user in user_list if user.get("uuid") == uuid), None)
 
@@ -109,7 +141,8 @@ class HiddifyApi:
         user_data["subData"] = self.get_data_from_sub(f"{self.sublinkurl}/{user_uuid}")
         return user_data
 
-    def backup_file(self):
+    def backup_file(self) -> bytes:
+        """Backup the file."""
         try:
             response = requests.get(f"{self.base_url}/admin/backup/backupfile/")
             if response.status_code == 200:
@@ -121,7 +154,8 @@ class HiddifyApi:
             print(f"Error in backup_file: {e}")
             return None
 
-    def get_data_from_sub(self, url):
+    def get_data_from_sub(self, url: str) -> list:
+        """Get data from a sub URL."""
         try:
             response = requests.get(f"{url}/sub/")
             lines = response.text.split("\n")
@@ -130,3 +164,4 @@ class HiddifyApi:
         except requests.RequestException as e:
             print(f"Error in get_data_from_sub: {e}")
             return []
+
