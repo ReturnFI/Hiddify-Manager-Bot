@@ -1,5 +1,5 @@
-from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler, CallbackQueryHandler
+from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler, CallbackQueryHandler, InlineQueryHandler
 from datetime import datetime, timedelta
 from api import HiddifyApi
 import logging
@@ -94,8 +94,8 @@ def process_user_info(update: Update, context: CallbackContext) -> None:
                 else:
                     update.message.reply_text('User not found.☹️')
                 del context.user_data['state']
-        else:
-            update.message.reply_text('Invalid command. Please use the buttons below.')
+        #else:
+            #update.message.reply_text('Invalid command. Please use the buttons below.')
 
 def display_user_info(update: Update, user_info: dict) -> None:
     last_online_str = user_info.get('last_online')
@@ -140,7 +140,7 @@ def display_user_info(update: Update, user_info: dict) -> None:
     response_text = (
         f"Name: {user_info['name']}\n"
         f"Package Days: {package_days}\n"
-        f"Start Date: {start_date.strftime('%Y-%m-%d') if start_date else '\U00002b55'}\n"
+        f"Start Date: {start_date.strftime('%Y-%m-%d') if start_date else '❌'}\n"
         f"Traffic: {current_usage_gb:.2f} / {usage_limit_gb} GB\n"
         f"Status: {status_emoji}\n"
         f"Last Online: {last_online_formatted}\n"
@@ -203,6 +203,49 @@ def help_command(update: Update, context: CallbackContext) -> None:
                                   'Replace `<UUID>` with the actual UUID of the user you want to show',
                                   parse_mode='MarkdownV2')
 
+def inline_query(update, context):
+    if check_authorization(update):
+        query = update.inline_query.query
+        user_list = hiddify_api.get_user_list()
+
+        results = []
+
+        if user_list:
+            for user in user_list:
+                user_uuid = user['uuid']
+                user_name = user['name']
+                package_days = user['package_days']
+                usage_limit_gb = user['usage_limit_GB']
+                current_usage_gb = user['current_usage_GB']
+                last_online_str = user['last_online']
+
+                if last_online_str:
+                    try:
+                        last_online = datetime.fromisoformat(last_online_str)
+                    except ValueError:
+                        last_online_formatted = "Not Active"
+                    else:
+                        last_online_formatted = last_online.strftime('%Y-%m-%d %H:%M:%S')
+                else:
+                    last_online_formatted = "Not Active"
+
+                response_text = (
+                    f"Name: {user_name}\n"
+                    f"Package Days: {package_days}\n"
+                    f"Traffic: {current_usage_gb:.2f} / {usage_limit_gb} GB\n"
+                    f"Last Online: {last_online_formatted}\n"
+                )
+
+                results.append(
+                    InlineQueryResultArticle(
+                        id=user_uuid,
+                        title=user_name,
+                        input_message_content=InputTextMessageContent(response_text)
+                    )
+                )
+
+        update.inline_query.answer(results)
+
 def handle_text_input(update: Update, context: CallbackContext) -> None:
     text = update.message.text.lower()
     if text == 'add user🍀':
@@ -219,9 +262,26 @@ def handle_text_input(update: Update, context: CallbackContext) -> None:
         update.message.reply_text("Invalid command. Please use the buttons below.")
 
 def check_authorization(update: Update) -> bool:
-    user_id = update.message.from_user.id
+    if update.message:
+        user_id = update.message.from_user.id
+        is_inline_query = False
+    elif update.inline_query and update.inline_query.from_user:
+        user_id = update.inline_query.from_user.id
+        is_inline_query = True
+    else:
+        return False
+
     if user_id not in hiddify_api.allowed_user_ids:
-        update.message.reply_text("🔐Sorry, you are not authorized to use this bot.🔐")
+        if is_inline_query:
+            update.inline_query.answer([
+                InlineQueryResultArticle(
+                    id="unauthorized",
+                    title="Unauthorized",
+                    input_message_content=InputTextMessageContent("🔐Sorry, you are not authorized to use this bot.🔐")
+                )
+            ])
+        else:
+            update.message.reply_text("🔐Sorry, you are not authorized to use this bot.🔐")
         return False
     return True
 
@@ -235,6 +295,8 @@ def main() -> None:
     dp.add_handler(MessageHandler(Filters.regex('^Add User🍀$|^Show User$|^Server Info🌐$|^Backup File📥$|^Help$'), handle_text_input))
     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, process_user_info))
     dp.add_handler(CallbackQueryHandler(reset_user))
+    dp.add_handler(InlineQueryHandler(inline_query))
+
 
     updater.start_polling()
 
