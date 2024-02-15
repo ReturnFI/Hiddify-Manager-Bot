@@ -146,10 +146,10 @@ def display_user_info(update: Update, user_info: dict) -> None:
         f"Last Online: {last_online_formatted}\n"
         f"Days Left: {days_left_text}\n"
     )
-    update.message.reply_text(response_text)
+    #update.message.reply_text(response_text)
     keyboard = [[InlineKeyboardButton("Reset user", callback_data=f"reset_{user_info['uuid']}")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text("Choose an option:", reply_markup=reply_markup)
+    update.message.reply_text(response_text, reply_markup=reply_markup)
 
 def reset_user(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
@@ -206,45 +206,51 @@ def help_command(update: Update, context: CallbackContext) -> None:
 def inline_query(update, context):
     if check_authorization(update):
         query = update.inline_query.query
-        user_list = hiddify_api.get_user_list()
+        if "list" in query.lower():
+            user_list = hiddify_api.get_user_list()
 
-        results = []
+            results = []
 
-        if user_list:
-            for user in user_list:
-                user_uuid = user['uuid']
-                user_name = user['name']
-                package_days = user['package_days']
-                usage_limit_gb = user['usage_limit_GB']
-                current_usage_gb = user['current_usage_GB']
-                last_online_str = user['last_online']
+            if user_list:
+                for user in user_list:
+                    user_uuid = user['uuid']
+                    user_name = user['name']
+                    package_days = user['package_days']
+                    usage_limit_gb = user['usage_limit_GB']
+                    current_usage_gb = user['current_usage_GB']
+                    last_online_str = user['last_online']
 
-                if last_online_str:
-                    try:
-                        last_online = datetime.fromisoformat(last_online_str)
-                    except ValueError:
-                        last_online_formatted = "Not Active"
+                    if last_online_str:
+                        try:
+                            last_online = datetime.fromisoformat(last_online_str)
+                        except ValueError:
+                            last_online_formatted = "Not Active"
+                        else:
+                            last_online_formatted = last_online.strftime('%Y/%m/%d %H:%M:%S')
                     else:
-                        last_online_formatted = last_online.strftime('%Y-%m-%d %H:%M:%S')
-                else:
-                    last_online_formatted = "Not Active"
+                        last_online_formatted = "Not Active"
 
-                response_text = (
-                    f"Name: {user_name}\n"
-                    f"Package Days: {package_days}\n"
-                    f"Traffic: {current_usage_gb:.2f} / {usage_limit_gb} GB\n"
-                    f"Last Online: {last_online_formatted}\n"
-                )
-
-                results.append(
-                    InlineQueryResultArticle(
-                        id=user_uuid,
-                        title=user_name,
-                        input_message_content=InputTextMessageContent(response_text)
+                    title = f"{user_name}"
+                    discrip = f"Traffic Limit: {usage_limit_gb:.2f} GB\n Package Days: {package_days}"
+                    
+                    response_text = (
+                        f"ID: `{user_uuid}`\n"
+                        f"Name: {user_name}\n"
+                        f"Package Days: {package_days}\n"
+                        f"Traffic: {current_usage_gb:.2f} / {usage_limit_gb} GB\n"
+                        f"Last Online: {last_online_formatted}\n"
                     )
-                )
+                    response_text = response_text.replace('.', '\\.')
+                    results.append(
+                        InlineQueryResultArticle(
+                            id=user_uuid,
+                            title=title,
+                            description=discrip,
+                            input_message_content=InputTextMessageContent(response_text, parse_mode='MarkdownV2')
+                        )
+                    )
 
-        update.inline_query.answer(results)
+            update.inline_query.answer(results)
 
 def handle_text_input(update: Update, context: CallbackContext) -> None:
     text = update.message.text.lower()
@@ -265,7 +271,7 @@ def check_authorization(update: Update) -> bool:
     if update.message:
         user_id = update.message.from_user.id
         is_inline_query = False
-    elif update.inline_query and update.inline_query.from_user:
+    elif update.inline_query:
         user_id = update.inline_query.from_user.id
         is_inline_query = True
     else:
@@ -284,6 +290,7 @@ def check_authorization(update: Update) -> bool:
             update.message.reply_text("🔐Sorry, you are not authorized to use this bot.🔐")
         return False
     return True
+
 
 # Set up the Telegram bot
 def main() -> None:
