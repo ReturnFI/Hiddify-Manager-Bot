@@ -61,6 +61,17 @@ class HiddifyApi:
             print(f"Error in get_user_list: {e}")
             return []
 
+    def get_user_list_name(self, query_name) -> list:
+        """Get the list of users and filter by name containing the query."""
+        try:
+            response = requests.get(f"{self.base_url}/api/v1/user/")
+            user_list = response.json()
+            filtered_users = [user for user in user_list if query_name.lower() in user.get('name', '').lower()]
+            return filtered_users
+        except requests.RequestException as e:
+            print(f"Error in get_user_list_name: {e}")
+            return []
+
     def add_service(self, uuid: str, comment: str, name: str, day: int, traffic: int, telegram_id: int) -> bool:
         """Add a new service."""
         if telegram_id not in self.allowed_user_ids:
@@ -164,4 +175,3 @@ class HiddifyApi:
         except requests.RequestException as e:
             print(f"Error in get_data_from_sub: {e}")
             return []
-
