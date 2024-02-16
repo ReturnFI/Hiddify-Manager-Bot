@@ -12,7 +12,7 @@ from qrcode.image.styles.moduledrawers.pil import CircleModuleDrawer
 # Conversation states
 SHOW_USER, ADD_USER = range(2)
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(name)s - %(message)s', level=logging.DEBUG)
 
 # Create a HiddifyApi instance
 hiddify_api = HiddifyApi()
@@ -205,14 +205,15 @@ def help_command(update: Update, context: CallbackContext) -> None:
 
 def inline_query(update, context):
     if check_authorization(update):
-        query = update.inline_query.query
-        if "list" in query.lower():
-            user_list = hiddify_api.get_user_list()
+        query = update.inline_query.query.strip().lower()
+        if query.startswith("list"):
+            query_name = query[5:].strip()
+            user_list = hiddify_api.get_user_list_name(query_name)
 
             results = []
 
             if user_list:
-                for user in user_list:
+                for user in user_list[:50]:
                     user_uuid = user['uuid']
                     user_name = user['name']
                     package_days = user['package_days']
@@ -311,4 +312,3 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
-
