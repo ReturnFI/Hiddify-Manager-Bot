@@ -2,6 +2,11 @@
 import requests
 from datetime import datetime
 import uuid
+import qrcode
+from io import BytesIO
+from qrcode.image.styledpil import StyledPilImage
+from qrcode.image.styles.colormasks import RadialGradiantColorMask
+from qrcode.image.styles.moduledrawers.pil import CircleModuleDrawer
 
 ALLOWED_USER_IDS = [11111111] # get it from https://t.me/userinfobot
 ADMIN_UUID = "Admin-UUID"
@@ -175,3 +180,16 @@ class HiddifyApi:
         except requests.RequestException as e:
             print(f"Error in get_data_from_sub: {e}")
             return []
+
+    def generate_qr_code(self, data: str) -> BytesIO:
+        """Generate a QR code for the given data."""
+        qr = qrcode.QRCode(version=1, box_size=10, border=2)
+        qr.add_data(data)
+        qr.make(fit=True)
+        qr_img = qr.make_image(fill_color="White", back_color="Transparent", image_factory=StyledPilImage, module_drawer=CircleModuleDrawer(), color_mask=RadialGradiantColorMask())
+        
+        qr_byte_io = BytesIO()
+        qr_img.save(qr_byte_io, format='PNG')
+        qr_byte_io.seek(0)
+        
+        return qr_byte_io
