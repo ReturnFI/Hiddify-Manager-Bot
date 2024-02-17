@@ -3,11 +3,6 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 from datetime import datetime, timedelta
 from api import HiddifyApi
 import logging
-import qrcode
-from io import BytesIO
-from qrcode.image.styledpil import StyledPilImage
-from qrcode.image.styles.colormasks import RadialGradiantColorMask
-from qrcode.image.styles.moduledrawers.pil import CircleModuleDrawer
 
 # Conversation states
 SHOW_USER, ADD_USER = range(2)
@@ -60,11 +55,7 @@ def process_user_info(update: Update, context: CallbackContext) -> None:
 
                     if result:
                         subscription_link = f"{hiddify_api.sublinkurl}/{uuid}/sub/"
-                        
-                        qr = qrcode.QRCode(version=1, box_size=10, border=2)
-                        qr.add_data(subscription_link)
-                        qr.make(fit=True)
-                        qr_img = qr.make_image(fill_color="White", back_color="Transparent", image_factory=StyledPilImage, module_drawer=CircleModuleDrawer(), color_mask=RadialGradiantColorMask())
+                        qr_byte_io = hiddify_api.generate_qr_code(subscription_link)
                         
                         message = (
                             f'User added successfully\n'
@@ -74,10 +65,6 @@ def process_user_info(update: Update, context: CallbackContext) -> None:
                             f'Package Days: {user_days} Days\n'
                             f'SubLink : `{subscription_link}`'
                         )
-                        
-                        qr_byte_io = BytesIO()
-                        qr_img.save(qr_byte_io, format='PNG')
-                        qr_byte_io.seek(0)
                         
                         update.message.reply_photo(photo=qr_byte_io, caption=message, parse_mode='MarkdownV2')
                     else:
@@ -137,6 +124,9 @@ def display_user_info(update: Update, user_info: dict) -> None:
     else:
         days_left_text = "User Not Active"
 
+    subscription_link = f"{hiddify_api.sublinkurl}/{user_info['uuid']}/sub/"
+    qr_byte_io = hiddify_api.generate_qr_code(subscription_link)
+
     response_text = (
         f"Name: {user_info['name']}\n"
         f"Package Days: {package_days}\n"
@@ -149,7 +139,8 @@ def display_user_info(update: Update, user_info: dict) -> None:
     #update.message.reply_text(response_text)
     keyboard = [[InlineKeyboardButton("Reset user", callback_data=f"reset_{user_info['uuid']}")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text(response_text, reply_markup=reply_markup)
+    update.message.reply_photo(photo=qr_byte_io, caption=response_text, reply_markup=reply_markup)
+
 
 def reset_user(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
