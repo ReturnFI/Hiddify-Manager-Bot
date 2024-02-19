@@ -164,13 +164,20 @@ def server_info(update: Update, context: CallbackContext) -> None:
             system_info = system_status.get('system', {})
             usage_history = system_status.get('usage_history', {})
             m5_online = usage_history.get('m5', {}).get('online', 'N/A')
-            total_usage_bytes = usage_history.get('total', {}).get('usage', 0)
-            total_usage_gb = total_usage_bytes / (1024 ** 3)
+            yesterday_online = usage_history.get('yesterday', {}).get('online', 'N/A')
+            usage_today = usage_history.get('today', {}).get('usage', 0) / (1024 ** 3)
+            usage_yesterday = usage_history.get('yesterday', {}).get('usage', 0) / (1024 ** 3)
+            total_usage_bytes = usage_history.get('total', {}).get('usage', 0) / (1024 ** 3)
             formatted_info = (
                 f"CPU Percent: {system_info.get('cpu_percent', 'N/A')}% ⚠️\n"
-                f"Disk Usage: {system_info.get('disk_used', 'N/A'):.2f}GB / {system_info.get('disk_total', 'N/A'):.2f}GB 〽️\n"
-                f"Total Usage: {total_usage_gb:.2f} GB 🛜\n"
                 f"RAM Usage: {system_info.get('ram_used', 'N/A'):.2f}GB / {system_info.get('ram_total', 'N/A'):.2f}GB 〽️\n"
+                f"Disk Usage: {system_info.get('disk_used', 'N/A'):.2f}GB / {system_info.get('disk_total', 'N/A'):.2f}GB 〽️\n"
+                f"Total Usage: {total_usage_bytes:.2f} GB 🛜\n"
+                f"----------------------------------------\n"
+                f"Yesterday Usage: {usage_yesterday:.2f} GB\n"
+                f"Yesterday Online: {yesterday_online}\n"
+                f"----------------------------------------\n"
+                f"Today Usage: {usage_today:.2f} GB\n"
                 f"Users Online: {m5_online} 🟢"
             )
             update.message.reply_text(f'Server Info (Live):\n{formatted_info}')
@@ -224,13 +231,14 @@ def inline_query(update, context):
 
                     title = f"{user_name}"
                     discrip = f"Traffic Limit: {usage_limit_gb:.2f} GB\n Package Days: {package_days}"
-                    
+                    subscription_link = f"{hiddify_api.sublinkurl}/{user_uuid}/sub/"
                     response_text = (
                         f"ID: `{user_uuid}`\n"
                         f"Name: {user_name}\n"
                         f"Package Days: {package_days}\n"
                         f"Traffic: {current_usage_gb:.2f} / {usage_limit_gb} GB\n"
                         f"Last Online: {last_online_formatted}\n"
+                        f"SubLink : `{subscription_link}`"
                     )
                     response_text = response_text.replace('.', '\\.')
                     results.append(
