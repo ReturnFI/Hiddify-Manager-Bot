@@ -2,7 +2,7 @@
 
 <b>1. Update and upgrade system packages:</b>
 
-`apt update && apt upgrade`
+`apt update && apt upgrade -y`
 
 <b>2. Install Python 3 and pip:</b>
 
