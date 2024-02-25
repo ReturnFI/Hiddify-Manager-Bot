@@ -10,6 +10,8 @@
 
 <b>3. Clone the bot repository:</b>
 
+`apt install git -y`
+
 `git clone https://github.com/Hiddify-Return/Hiddify-Manager-Bot.git`
 
 <b>4. Navigate to the cloned directory:</b>
