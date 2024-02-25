@@ -1,3 +1,8 @@
+# About Hiddify Manager Bot
+
+This bot currently only works with API version 1.
+And this bot is for testing purposes.
+
 # Installation Steps:
 
 <b>1. Update and upgrade system packages:</b>
