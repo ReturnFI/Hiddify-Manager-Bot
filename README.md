@@ -49,7 +49,7 @@ Replace the placeholders with your actual values.
 
 <b>1.Run the bot temporarily:</b>
 
-`pyhton3 telegram_bot.py`
+`python3 telegram_bot.py`
 
 # Creating a systemd Service (Optional):
 <b>1. Create a systemd service file:</b>
