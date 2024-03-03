@@ -30,18 +30,18 @@ And this bot is for testing purposes.
 
 # Configuration:
 
-<b>1. Open `api.py` with an editor like nano:</b>
+<b>1. Open or create `.env` with an editor like nano:</b>
 
-`nano api.py`
+`nano .env`
 
-<b>2. Edit the following lines according to your configuration:</b>
+<b>2. Add the following lines according to your configuration:</b>
 
-```python
-ALLOWED_USER_IDS = [11111111] # get it from https://t.me/userinfobot
-ADMIN_UUID = "Admin-UUID"
-ADMIN_URLAPI = "https://Admin-UURL"
-SUBLINK_URL = "https://subscription_URL"
-TELEGRAM_TOKEN = "BOT-TOKEN"
+```
+ALLOWED_USER_IDS=11111111
+ADMIN_UUID=Admin-UUID
+ADMIN_URLAPI=https://Admin-URL
+SUBLINK_URL=https://subscription_URL
+TELEGRAM_TOKEN=BOT-TOKEN
 ```
 Replace the placeholders with your actual values.
 
