@@ -7,12 +7,16 @@ from io import BytesIO
 from qrcode.image.styledpil import StyledPilImage
 from qrcode.image.styles.colormasks import RadialGradiantColorMask
 from qrcode.image.styles.moduledrawers.pil import CircleModuleDrawer
+from dotenv import load_dotenv
+import os
 
-ALLOWED_USER_IDS = [11111111] # get it from https://t.me/userinfobot
-ADMIN_UUID = "Admin-UUID"
-ADMIN_URLAPI = "https://Admin-UURL"
-SUBLINK_URL = "https://subscription_URL"
-TELEGRAM_TOKEN = "BOT-TOKEN"
+
+load_dotenv()
+ALLOWED_USER_IDS = [int(id) for id in os.getenv("ALLOWED_USER_IDS", "").split(",")]
+ADMIN_UUID = os.getenv("ADMIN_UUID")
+ADMIN_URLAPI = os.getenv("ADMIN_URLAPI")
+SUBLINK_URL = os.getenv("SUBLINK_URL")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 class HiddifyApi:
     def __init__(self):
