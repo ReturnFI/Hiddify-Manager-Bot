@@ -137,19 +137,39 @@ def display_user_info(update: Update, user_info: dict) -> None:
         f"Days Left: {days_left_text}\n"
     )
     #update.message.reply_text(response_text)
-    keyboard = [[InlineKeyboardButton("Reset user", callback_data=f"reset_{user_info['uuid']}")]]
+    keyboard = [
+        [
+            InlineKeyboardButton("Reset User", callback_data=f"reset_{user_info['uuid']}"),
+            InlineKeyboardButton("Reset Traffic", callback_data=f"traffic_{user_info['uuid']}"),
+            InlineKeyboardButton("Reset Days", callback_data=f"days_{user_info['uuid']}")
+        ]
+    ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.message.reply_photo(photo=qr_byte_io, caption=response_text, reply_markup=reply_markup)
 
-
 def reset_user(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
-    uuid = query.data.split("_")[1]
-    if hiddify_api.reset_user_last_reset_time(uuid):
-        query.answer("User reset successfully.")
-    else:
-        query.answer("Failed to reset user.")
+    data = query.data.split("_")
+    action = data[0]
+    uuid = data[-1]
 
+    if action == "reset":
+        if hiddify_api.reset_user_last_reset_time(uuid):
+            query.answer("User reset successfully.")
+        else:
+            query.answer("Failed to reset user.")
+    elif action == "traffic":
+        if hiddify_api.update_traffic(uuid):
+            query.answer("Traffic reset successfully.")
+        else:
+            query.answer("Failed to reset traffic.")
+    elif action == "days":
+        if hiddify_api.update_package_days(uuid):
+            query.answer("Days reset successfully.")
+        else:
+            query.answer("Failed to reset days.")
+    else:
+        query.answer("Invalid action.")
 
 def show_user(update: Update, context: CallbackContext) -> None:
     if check_authorization(update):
@@ -173,10 +193,10 @@ def server_info(update: Update, context: CallbackContext) -> None:
                 f"RAM Usage: {system_info.get('ram_used', 'N/A'):.2f}GB / {system_info.get('ram_total', 'N/A'):.2f}GB 〽️\n"
                 f"Disk Usage: {system_info.get('disk_used', 'N/A'):.2f}GB / {system_info.get('disk_total', 'N/A'):.2f}GB 〽️\n"
                 f"Total Usage: {total_usage_bytes:.2f} GB 🛜\n"
-                f"----------------------------------------\n"
+                f"----------------------------------\n"
                 f"Yesterday Usage: {usage_yesterday:.2f} GB\n"
                 f"Yesterday Online: {yesterday_online}\n"
-                f"----------------------------------------\n"
+                f"----------------------------------\n"
                 f"Today Usage: {usage_today:.2f} GB\n"
                 f"Users Online: {m5_online} 🟢"
             )
@@ -191,15 +211,6 @@ def backup_file(update: Update, context: CallbackContext) -> None:
             context.bot.send_document(update.message.chat_id, document=backup_data, filename='backup.json')
         else:
             update.message.reply_text('Failed to retrieve backup file.')
-
-def help_command(update: Update, context: CallbackContext) -> None:
-    if check_authorization(update):
-        update.message.reply_text('To show a specific user, use the following command:\n'
-                                  '`/show_user <UUID>`\n\n'
-                                  'For example:\n'
-                                  '`/show_user 12345678-1234-1234-1234-1234567890ab`\n\n'
-                                  'Replace `<UUID>` with the actual UUID of the user you want to show',
-                                  parse_mode='MarkdownV2')
 
 def inline_query(update, context):
     if check_authorization(update):
@@ -262,8 +273,6 @@ def handle_text_input(update: Update, context: CallbackContext) -> None:
         server_info(update, context)
     elif text == 'backup file📥':
         backup_file(update, context)
-    elif text == 'help':
-        help_command(update, context)
     else:
         update.message.reply_text("Invalid command. Please use the buttons below.")
 
@@ -291,23 +300,17 @@ def check_authorization(update: Update) -> bool:
         return False
     return True
 
-
 # Set up the Telegram bot
 def main() -> None:
     teltoken = hiddify_api.telegram_token
     updater = Updater(teltoken)
-
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(MessageHandler(Filters.regex('^Add User🍀$|^Show User$|^Server Info🌐$|^Backup File📥$|^Help$'), handle_text_input))
+    dp.add_handler(MessageHandler(Filters.regex('^Add User🍀$|^Show User$|^Server Info🌐$|^Backup File📥$'), handle_text_input))
     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, process_user_info))
     dp.add_handler(CallbackQueryHandler(reset_user))
     dp.add_handler(InlineQueryHandler(inline_query))
-
-
     updater.start_polling()
-
     updater.idle()
-
 if __name__ == '__main__':
     main()

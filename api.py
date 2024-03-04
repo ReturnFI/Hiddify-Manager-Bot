@@ -121,28 +121,29 @@ class HiddifyApi:
             print(f"Error in reset_user_last_reset_time: {e}")
             return False
 
-    def update_package_days(self, uuid: str, new_days: int) -> bool:
+    def update_package_days(self, uuid: str) -> bool:
         """Update the package days for a user."""
         try:
             user_data = self.find_service(uuid)
             if not user_data:
                 print("User not found.")
                 return False
-            user_data['package_days'] = new_days
+            user_data['last_reset_time'] = datetime.now().strftime('%Y-%m-%d')
+            user_data['start_date'] = None
             endpoint = f"{self.base_url}/api/v1/user/?uuid={uuid}"
             return self.make_post_request(endpoint, user_data)
         except requests.RequestException as e:
             print(f"Error in update_package_days: {e}")
             return False
 
-    def update_traffic(self, uuid: str, new_traffic: int) -> bool:
-        """Update the traffic limit for a user."""
+    def update_traffic(self, uuid: str) -> bool:
+        """Reset the traffic limit for a user to 0."""
         try:
             user_data = self.find_service(uuid)
             if not user_data:
                 print("User not found.")
                 return False
-            user_data['usage_limit_GB'] = new_traffic
+            user_data['current_usage_GB'] = 0
             endpoint = f"{self.base_url}/api/v1/user/?uuid={uuid}"
             return self.make_post_request(endpoint, user_data)
         except requests.RequestException as e:
