@@ -7,7 +7,7 @@ import logging
 # Conversation states
 SHOW_USER, ADD_USER = range(2)
 
-logging.basicConfig(format='%(name)s - %(message)s', level=logging.DEBUG)
+#logging.basicConfig(format='%(name)s - %(message)s', level=logging.DEBUG)
 
 # Create a HiddifyApi instance
 hiddify_api = HiddifyApi()
@@ -137,15 +137,41 @@ def display_user_info(update: Update, user_info: dict) -> None:
         f"Days Left: {days_left_text}\n"
     )
     #update.message.reply_text(response_text)
+    refresh_button = InlineKeyboardButton("Refresh \U0001F504", callback_data=f"refresh_{user_info['uuid']}")
     keyboard = [
         [
             InlineKeyboardButton("Reset User", callback_data=f"reset_{user_info['uuid']}"),
             InlineKeyboardButton("Reset Traffic", callback_data=f"traffic_{user_info['uuid']}"),
             InlineKeyboardButton("Reset Days", callback_data=f"days_{user_info['uuid']}")
-        ]
+        ],
+        [refresh_button]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_photo(photo=qr_byte_io, caption=response_text, reply_markup=reply_markup)
+    
+    if update.callback_query:
+        query = update.callback_query
+        chat_id = query.message.chat.id
+        message_id = query.message.message_id
+        current_caption = str(query.message.caption)
+        if current_caption != str(response_text):
+            response_text_with_time = response_text + f"\nLast Refresh\U0001F504: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            query.edit_message_caption(
+                caption=response_text_with_time,
+                reply_markup=reply_markup
+            )
+    else:
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        update.message.reply_photo(photo=qr_byte_io, caption=response_text, reply_markup=reply_markup)
+
+def refresh_user_info(update: Update, context: CallbackContext) -> None:
+    query = update.callback_query
+    uuid = query.data.split("_")[-1]
+    updated_user_info = hiddify_api.find_service(uuid)
+    if updated_user_info:
+        display_user_info(update, updated_user_info)
+    else:
+        query.answer("Failed to refresh user info. User not found.")
 
 def reset_user(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
@@ -300,6 +326,7 @@ def check_authorization(update: Update) -> bool:
         return False
     return True
 
+
 # Set up the Telegram bot
 def main() -> None:
     teltoken = hiddify_api.telegram_token
@@ -308,6 +335,7 @@ def main() -> None:
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(MessageHandler(Filters.regex('^Add User🍀$|^Show User$|^Server Info🌐$|^Backup File📥$'), handle_text_input))
     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, process_user_info))
+    dp.add_handler(CallbackQueryHandler(refresh_user_info, pattern=r'^refresh_[\w-]+$'))
     dp.add_handler(CallbackQueryHandler(reset_user))
     dp.add_handler(InlineQueryHandler(inline_query))
     updater.start_polling()
