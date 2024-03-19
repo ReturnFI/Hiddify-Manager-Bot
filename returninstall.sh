@@ -41,3 +41,9 @@ if pgrep -f "python3 telegram_bot.py" &> /dev/null; then
 else
     sleep 1 && echo -e "\n\nThere is a problem!\n\n"
 fi
+
+chmod +x returninstall.sh
+cronjob="@reboot sleep 20 && /bin/bash /Hiddify-Manager-Bot/returninstall.sh"
+if ! crontab -l | grep -Fq "$cronjob"; then
+  (crontab -l 2>/dev/null; echo "$cronjob") | crontab -
+fi
