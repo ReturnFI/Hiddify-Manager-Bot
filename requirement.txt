@@ -2,3 +2,5 @@ pillow
 python-telegram-bot==13.8
 qrcode
 requests
+python-dotenv
+python-dateutil
