@@ -1,10 +1,32 @@
 # About Hiddify Manager Bot
 
-This bot currently only works with API version 1.
+Hello , and welcome to the [Hiddify Manager](https://github.com/hiddify/Hiddify-Manager) Bot GitHub page. I'm currently developing a bot for managing the Hiddify panel, and I'd be delighted if you could assist me in testing and refining the bot through trial and error. Additionally, if you have any ideas, I'd love to hear them. Thank you!
 
-And this bot is for testing purposes.
+> [!IMPORTANT]
+> This bot currently only works with API version 1.0 and this bot is for testing purposes.
 
-# Installation Steps:
+# How to Automatic Installation ?
+To use the bot , you will need the following information:
+1. **Chat ID:** You need to obtain this from the [@chatIDrobot](https://t.me/chatIDrobot).
+2. **Bot Token:** You need to obtain this from the [@botfather](https://t.me/BotFather).
+3. **Admin uuid:** Enter your admin uuid.
+4. **Admin url:** Enter your panel url.
+5. **Admin sublink:** Enter your panel sublink.
+
+
+### install command :
+```
+cd / && rm -f returninstall.sh* || true && wget https://raw.githubusercontent.com/H-Return/Hiddify-Manager-Bot/main/returninstall.sh && chmod +x returninstall.sh && ./returninstall.sh
+```
+
+> [!NOTE]
+> With this method, you enter only the required information.
+
+### restart command :
+```
+cd / && rm -f returnrestart.sh* || true && wget https://raw.githubusercontent.com/H-Return/Hiddify-Manager-Bot/main/returnrestart.sh && chmod +x returnrestart.sh && ./returnrestart.sh
+```
+# How to Manuel Installation ?
 
 <b>1. Update and upgrade system packages:</b>
 
@@ -28,7 +50,7 @@ And this bot is for testing purposes.
 
 `pip install -r requirement.txt`
 
-# Configuration:
+## Configuration:
 
 <b>1. Open or create `.env` with an editor like nano:</b>
 
@@ -45,7 +67,7 @@ TELEGRAM_TOKEN=BOT-TOKEN
 ```
 Replace the placeholders with your actual values.
 
-# Running the Bot:
+## Running the Bot:
 
 <b>1.Run the bot temporarily:</b>
 
