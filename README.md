@@ -26,57 +26,52 @@ cd / && rm -f returninstall.sh* || true && wget https://raw.githubusercontent.co
 ```
 cd / && rm -f returnrestart.sh* || true && wget https://raw.githubusercontent.com/H-Return/Hiddify-Manager-Bot/main/returnrestart.sh && chmod +x returnrestart.sh && ./returnrestart.sh
 ```
-# How to Manuel Installation ?
 
-<b>1. Update and upgrade system packages:</b>
+<details>
+  <summary><b>How to Manuel Installation ?</b></summary>
+  <p><b>1. Update and upgrade system packages:</b></p>
+  <pre><code>apt update && apt upgrade -y</code></pre>
 
-`apt update && apt upgrade -y`
+  <p><b>2. Install Python 3 and pip:</b></p>
+  <pre><code>apt install python3 && apt install python3-pip</code></pre>
 
-<b>2. Install Python 3 and pip:</b>
+  <p><b>3. Clone the bot repository:</b></p>
+  <pre><code>apt install git -y</code></pre>
+  <pre><code>git clone https://github.com/Hiddify-Return/Hiddify-Manager-Bot.git</code></pre>
 
-`apt install python3 && apt install python3-pip`
+  <p><b>4. Navigate to the cloned directory:</b></p>
+  <pre><code>cd Hiddify-Manager-Bot</code></pre>
 
-<b>3. Clone the bot repository:</b>
+  <p><b>5. Install required Python packages:</b></p>
+  <pre><code>pip install -r requirement.txt</code></pre>
 
-`apt install git -y`
+  <h2>Configuration:</h2>
 
-`git clone https://github.com/Hiddify-Return/Hiddify-Manager-Bot.git`
+  <p><b>1. Open or create <code>.env</code> with an editor like nano:</b></p>
+  <pre><code>nano .env</code></pre>
 
-<b>4. Navigate to the cloned directory:</b>
+  <p><b>2. Add the following lines according to your configuration:</b></p>
+  <pre><code>
+  ALLOWED_USER_IDS=11111111
+  ADMIN_UUID=Admin-UUID
+  ADMIN_URLAPI=https://Admin-URL
+  SUBLINK_URL=https://subscription_URL
+  TELEGRAM_TOKEN=BOT-TOKEN
+  </code></pre>
+  <p>Replace the placeholders with your actual values.</p>
 
-`cd Hiddify-Manager-Bot`
+  <h2>Running the Bot:</h2>
 
-<b>5. Install required Python packages:</b>
-
-`pip install -r requirement.txt`
-
-## Configuration:
-
-<b>1. Open or create `.env` with an editor like nano:</b>
-
-`nano .env`
-
-<b>2. Add the following lines according to your configuration:</b>
-
-```
-ALLOWED_USER_IDS=11111111
-ADMIN_UUID=Admin-UUID
-ADMIN_URLAPI=https://Admin-URL
-SUBLINK_URL=https://subscription_URL
-TELEGRAM_TOKEN=BOT-TOKEN
-```
-Replace the placeholders with your actual values.
-
-## Running the Bot:
-
-<b>1.Run the bot temporarily:</b>
-
-`python3 telegram_bot.py`
+  <p><b>1. Run the bot temporarily:</b></p>
+  <pre><code>python3 telegram_bot.py</code></pre>
+</details>
 
 # Creating a systemd Service (Optional):
 <b>1. Create a systemd service file:</b>
 
-`nano /etc/systemd/system/telegram_bot.service`
+```
+nano /etc/systemd/system/telegram_bot.service
+```
 
 <b>2. Paste the following content into the file:</b>
 
@@ -95,10 +90,16 @@ WantedBy=multi-user.target
 ``` 
 <b>3. Reload systemd and enable/start the service:</b>
 
-`sudo systemctl daemon-reload`
+```
+sudo systemctl daemon-reload
+```
 
-`sudo systemctl enable telegram_bot`
+```
+sudo systemctl enable telegram_bot
+```
 
-`sudo systemctl start telegram_bot`
+```
+sudo systemctl start telegram_bot
+```
 
 Now, your Hiddify Manager Bot should be set up and running as a systemd service, ready to serve its purpose. Make sure to replace placeholder values with your actual configuration details.
