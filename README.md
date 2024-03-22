@@ -8,10 +8,10 @@ Hello , and welcome to the [Hiddify Manager](https://github.com/hiddify/Hiddify-
 # How to Automatic Installation ?
 To use the bot , you will need the following information:
 1. **Chat ID:** You need to obtain this from the [@chatIDrobot](https://t.me/chatIDrobot).
-2. **Bot Token:** You need to obtain this from the [@botfather](https://t.me/BotFather).
+2. **Admin sublink:** Enter your panel sublink.
 3. **Admin uuid:** Enter your admin uuid.
 4. **Admin url:** Enter your panel url.
-5. **Admin sublink:** Enter your panel sublink.
+5. **Bot Token:** You need to obtain this from the [@botfather](https://t.me/BotFather).
 
 
 ### install command :
