@@ -16,15 +16,7 @@ To use the bot , you will need the following information:
 
 ### install command :
 ```
-cd / && rm -f returninstall.sh* || true && wget https://raw.githubusercontent.com/H-Return/Hiddify-Manager-Bot/main/returninstall.sh && chmod +x returninstall.sh && ./returninstall.sh
-```
-
-> [!NOTE]
-> With this method, you enter only the required information.
-
-### restart command :
-```
-cd / && rm -f returnrestart.sh* || true && wget https://raw.githubusercontent.com/H-Return/Hiddify-Manager-Bot/main/returnrestart.sh && chmod +x returnrestart.sh && ./returnrestart.sh
+bash -c "$(curl -L https://raw.githubusercontent.com/H-Return/Hiddify-Manager-Bot/main/install.sh)"
 ```
 
 <details>
@@ -66,40 +58,3 @@ cd / && rm -f returnrestart.sh* || true && wget https://raw.githubusercontent.co
   <pre><code>python3 telegram_bot.py</code></pre>
 </details>
 
-# Creating a systemd Service (Optional):
-<b>1. Create a systemd service file:</b>
-
-```
-nano /etc/systemd/system/telegram_bot.service
-```
-
-<b>2. Paste the following content into the file:</b>
-
-```
-[Unit]
-Description=HiddifyBOT Service
-After=network.target
-
-[Service]
-WorkingDirectory=/root/Hiddify-Manager-Bot/
-ExecStart=/usr/bin/python telegram_bot.py
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-``` 
-<b>3. Reload systemd and enable/start the service:</b>
-
-```
-sudo systemctl daemon-reload
-```
-
-```
-sudo systemctl enable telegram_bot
-```
-
-```
-sudo systemctl start telegram_bot
-```
-
-Now, your Hiddify Manager Bot should be set up and running as a systemd service, ready to serve its purpose. Make sure to replace placeholder values with your actual configuration details.
