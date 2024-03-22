@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  HiddifyBot:
+  hiddifyBot:
     build:
       context: .
       dockerfile: Dockerfile
