@@ -16,6 +16,7 @@ git clone "$repository_url" "$install_dir"
 cd "$install_dir"
 
 # Prompt for environment variables
+clear
 echo "Please provide the following environment variables:"
 
 read -p "ALLOWED_USER_IDS: " ALLOWED_USER_IDS
