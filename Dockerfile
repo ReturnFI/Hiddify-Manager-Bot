@@ -11,7 +11,7 @@ RUN apt update && apt upgrade -y && \
     && rm -rf /var/lib/apt/lists /var/cache/apt/archives /tmp
 
 COPY requirement.txt requirement.txt
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r requirement.txt
 
 COPY . .
 
