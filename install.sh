@@ -34,5 +34,5 @@ echo "TELEGRAM_TOKEN=$TELEGRAM_TOKEN" >> .env
 
 # Start the Docker containers
 docker-compose up -d
-
+clear
 echo "HiddifyBot Docker containers are now up and running."
