@@ -19,11 +19,11 @@ cd "$install_dir"
 clear
 echo "Please provide the following environment variables:"
 
-read -p "ALLOWED_USER_IDS: " ALLOWED_USER_IDS
-read -p "ADMIN_UUID: " ADMIN_UUID
-read -p "ADMIN_URLAPI: " ADMIN_URLAPI
-read -p "SUBLINK_URL: " SUBLINK_URL
-read -p "TELEGRAM_TOKEN: " TELEGRAM_TOKEN
+read -p "Chat ID: " ALLOWED_USER_IDS
+read -p "Admin uuid: " ADMIN_UUID
+read -p "Admin panel url: " ADMIN_URLAPI
+read -p "Panel sublink url: " SUBLINK_URL
+read -p "Bot Token: " TELEGRAM_TOKEN
 
 # Set environment variables in .env file
 echo "ALLOWED_USER_IDS=$ALLOWED_USER_IDS" >> .env
