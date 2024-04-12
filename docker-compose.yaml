@@ -6,4 +6,4 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8443:8443"  # Change port mapping if needed
+      - "88:88"  # Change port mapping if needed
