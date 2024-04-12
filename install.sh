@@ -9,6 +9,10 @@ apt update && apt upgrade -y
 # Install necessary packages
 apt install -y python3 python3-pip git python3-dev python3-venv docker docker-compose
 
+#Remove old installation directory
+cd /opt/
+rm -r Hiddify-Manager-Bot
+
 # Clone the repository
 git clone "$repository_url" "$install_dir"
 
