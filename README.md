@@ -35,7 +35,7 @@ bash -c "$(curl -L https://raw.githubusercontent.com/H-Return/Hiddify-Manager-Bo
   <pre><code>cd Hiddify-Manager-Bot</code></pre>
 
   <p><b>5. Install required Python packages:</b></p>
-  <pre><code>pip install -r requirement.txt</code></pre>
+  <pre><code>pip install -r requirements.txt</code></pre>
 
   <h2>Configuration:</h2>
 
@@ -55,6 +55,6 @@ bash -c "$(curl -L https://raw.githubusercontent.com/H-Return/Hiddify-Manager-Bo
   <h2>Running the Bot:</h2>
 
   <p><b>1. Run the bot temporarily:</b></p>
-  <pre><code>python3 telegram_bot.py</code></pre>
+  <pre><code>python3 main.py</code></pre>
 </details>
 
